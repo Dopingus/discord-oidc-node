@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: discord-oidc
+  labels:
+    app: discord-oidc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: discord-oidc
+  template:
+    metadata:
+      labels:
+        app: discord-oidc
+      name: discord-oidc
+    spec:
+      containers:
+        - name: discord-oidc
+          image: dopingus/discord-oidc-node:latest
+          env:
+            - name: CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: discord-oidc-secret
+                  key: CLIENT_SECRET
+                  optional: false
+          envFrom:
+            - configMapRef:
+                name: discord-oidc-config
+          ports:
+            - containerPort: 8080
+              name: discord-oidc
+          resources:
+            requests:
+              cpu: "10m"
+      restartPolicy: Always
